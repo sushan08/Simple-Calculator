@@ -30,13 +30,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//==================================================================================
-//Slot functions
-//==================================================================================
-// Called whenever a number button is clicked
 void MainWindow::numberGroup_clicked(QAbstractButton* button)
 {
-    //Get string from display
+
     QString displayLabel = ui->displayPanel->text();
 
     /* Check if the previous button that was clicked was an operator button.
@@ -46,16 +42,12 @@ void MainWindow::numberGroup_clicked(QAbstractButton* button)
         displayLabel.clear();
         operatorClicked = false;
     }
-
-    //Append the digit only if we are not exceeding the digit limit
     if (displayLabel.length() >= DIGIT_LIMIT) {
         return;
     }
 
-    //Append requested digit
     displayLabel.append(button->text());
 
-    //Set number back to display
     ui->displayPanel->setText(displayLabel);
 }
 
@@ -67,7 +59,7 @@ void MainWindow::actionGroup_clicked(QAbstractButton* button)
      * If it was though, we need to see whether we just need to save the number that is
      * displayed or if there is already a number stored in memory, perform the calculation and
      * store the result.
-     * Example for this case: 5 + 7 + -> We need to save 12 in memory and then save operator. */
+     */
 
     if (operatorClicked) {
         storedOperator = button->text().at(0);
@@ -77,16 +69,12 @@ void MainWindow::actionGroup_clicked(QAbstractButton* button)
             calculate_result();
         }
         else {
-            //Set the flag to indicate that we now have a number stored in memory
             hasStoredNumber = true;
-            //Get string from display
             QString displayLabel = ui->displayPanel->text();
             //Convert string to double and save
             storedNumber = displayLabel.toDouble();
         }
-        //Set the flag that the last button that was clicked was an operator
         operatorClicked = true;
-        //Store operator in memory
         storedOperator = button->text().at(0);
     }
 }
@@ -132,10 +120,7 @@ void MainWindow::on_comma_clicked()
     //Get string from display
     QString displayLabel = ui->displayPanel->text();
 
-    /* Append the digit only if we are not exceeding the digit limit.
-     * More specifically in this case, we need 2 digits to be available.
-     * One for the comma and at least another one for a remaining digit.
-     * Also check if whether there is another comma already present. */
+
     if (displayLabel.length() >= (DIGIT_LIMIT - 1) ||
         displayLabel.contains('.', Qt::CaseSensitive)) {
         return;
@@ -189,9 +174,7 @@ void MainWindow::on_actionSign_clicked()
     ui->displayPanel->setText(displayLabel);
 }
 
-//==================================================================================
-//Helper functions
-//==================================================================================
+
 void MainWindow::calculate_result() {
     //Get string from display
     QString displayLabel = ui->displayPanel->text();
@@ -215,14 +198,13 @@ void MainWindow::calculate_result() {
          storedNumber /= displayLabel.toDouble();
      }
 
-     //Since there might be an overflow, its best to convert the number carefully
      displayLabel = QString::number(storedNumber,'g', DIGIT_LIMIT);
 
      //Set number back to display
      ui->displayPanel->setText(displayLabel);
 }
 
-//Keyboard buttons should call the corresponding functions
+//Keyboard buttons calling the corresponding functions
 void MainWindow::keyPressEvent(QKeyEvent *e) {
     switch (e->key()) {
         //Numbers
@@ -269,23 +251,20 @@ void MainWindow::keyPressEvent(QKeyEvent *e) {
         case Qt::Key_Slash:
             actionGroup_clicked(ui->actionDiv);
             break;
-        //Comma
         case Qt::Key_Period:
             on_comma_clicked();
             break;
-        //Return (enter)
         case Qt::Key_Enter:
         case Qt::Key_Return:
             on_actionCalc_clicked();
             break;
-        //Backspace and delete
         case Qt::Key_Backspace:
             on_actionDel_clicked();
             break;
         case Qt::Key_Delete:
             on_actionClear_clicked();
             break;
-        //Percentage
+
         case Qt::Key_Percent:
             on_actionPercent_clicked();
             break;
